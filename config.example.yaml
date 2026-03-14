@@ -1,0 +1,29 @@
+# CrossPost Configuration Example
+# Copy this file to config.yaml and fill in your channel IDs.
+# All fields shown with their default values unless marked required.
+
+# --- Required: List of YouTube channels to monitor ---
+channels:
+  - channel_id: "UCxxxxxxxxxxxxxxxxxxxxxxx"  # REQUIRED: YouTube channel ID
+    name: "Channel Display Name"             # Optional: human-readable label
+    # max_duration: 120                       # Optional: per-channel override (seconds)
+
+  # Add more channels as needed:
+  # - channel_id: "UCyyyyyyyyyyyyyyyyyyyyyyy"
+  #   name: "Another Channel"
+
+# --- Download settings ---
+download:
+  output_dir: "./downloads"    # Directory for downloaded files
+  max_duration: 180            # Skip videos longer than this (seconds, default: 180 = 3 min)
+  cookies_browser: "firefox"   # Browser to extract cookies from (for age-gated content)
+  # format: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+
+# --- Scheduling settings ---
+schedule:
+  poll_interval_minutes: 30   # How often to check channels for new videos (min: 1)
+  misfire_grace_time: 300     # How long to wait if a job fires late (seconds)
+
+# --- Application settings ---
+database_url: "sqlite:///crosspost.db"   # SQLite database file path
+log_level: "INFO"                         # Logging level: DEBUG, INFO, WARNING, ERROR
