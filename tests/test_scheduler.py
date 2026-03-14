@@ -213,13 +213,14 @@ def test_recover_downloading_leaves_other_statuses_untouched(in_memory_engine):
 def test_poll_and_download_job(sample_settings, in_memory_engine):
     """poll_and_download_job calls discover_new_videos for each channel then process_discovered_videos."""
     with (
+        patch("crosspost.scheduler.get_engine", return_value=in_memory_engine),
         patch("crosspost.scheduler.discover_new_videos") as mock_discover,
         patch("crosspost.scheduler.process_discovered_videos") as mock_process,
     ):
         mock_discover.return_value = []
         mock_process.return_value = 0
 
-        poll_and_download_job(sample_settings, in_memory_engine)
+        poll_and_download_job(sample_settings)
 
         assert mock_discover.call_count == 2
         calls = mock_discover.call_args_list
@@ -231,20 +232,24 @@ def test_poll_and_download_job(sample_settings, in_memory_engine):
 
 def test_poll_and_download_job_exception_does_not_propagate(sample_settings, in_memory_engine):
     """Exceptions inside poll_and_download_job are caught so the scheduler stays alive."""
-    with patch("crosspost.scheduler.discover_new_videos", side_effect=RuntimeError("boom")):
+    with (
+        patch("crosspost.scheduler.get_engine", return_value=in_memory_engine),
+        patch("crosspost.scheduler.discover_new_videos", side_effect=RuntimeError("boom")),
+    ):
         # Should NOT raise -- exception must be caught internally
-        poll_and_download_job(sample_settings, in_memory_engine)
+        poll_and_download_job(sample_settings)
 
 
 def test_poll_and_download_job_no_channels(in_memory_engine):
     """poll_and_download_job works correctly when there are no channels configured."""
     settings = AppSettings(channels=[])
     with (
+        patch("crosspost.scheduler.get_engine", return_value=in_memory_engine),
         patch("crosspost.scheduler.discover_new_videos") as mock_discover,
         patch("crosspost.scheduler.process_discovered_videos") as mock_process,
     ):
         mock_process.return_value = 0
-        poll_and_download_job(settings, in_memory_engine)
+        poll_and_download_job(settings)
 
         mock_discover.assert_not_called()
         mock_process.assert_called_once()

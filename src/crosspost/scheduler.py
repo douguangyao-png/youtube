@@ -8,6 +8,7 @@ from sqlalchemy.engine import Engine
 from sqlmodel import Session, select
 
 from crosspost.config import AppSettings
+from crosspost.database import get_engine
 from crosspost.downloader import process_discovered_videos
 from crosspost.feeds import discover_new_videos
 from crosspost.models import Content, ContentStatus
@@ -44,8 +45,12 @@ def recover_incomplete_downloads(engine: Engine) -> int:
     return count
 
 
-def poll_and_download_job(settings: AppSettings, engine: Engine) -> None:
+def poll_and_download_job(settings: AppSettings) -> None:
     """APScheduler job: poll all channels for new videos and download them.
+
+    Creates a fresh database engine from settings.database_url on each
+    invocation. This is required because SQLAlchemy Engine objects are not
+    picklable and cannot be stored in APScheduler's persistent job store.
 
     Iterates over every channel in settings, calls discover_new_videos to
     insert newly found videos into the database, then calls
@@ -57,10 +62,10 @@ def poll_and_download_job(settings: AppSettings, engine: Engine) -> None:
 
     Args:
         settings: Application configuration containing channel list and
-                  download/schedule parameters.
-        engine: SQLAlchemy engine connected to the content database.
+                  download/schedule parameters (must be picklable).
     """
     try:
+        engine = get_engine(settings.database_url)
         total_discovered = 0
         for channel in settings.channels:
             new_videos = discover_new_videos(engine, channel)
@@ -85,6 +90,11 @@ def create_scheduler(settings: AppSettings, engine: Engine) -> BlockingScheduler
     from settings.database_url by appending '_jobs') to prevent lock
     contention with the content database.
 
+    The job receives only ``settings`` (a picklable Pydantic model) — not the
+    engine — because APScheduler serialises job arguments via pickle for the
+    persistent job store. Engines are not picklable; the job creates its own
+    engine from settings.database_url on each run.
+
     Job defaults:
       - coalesce=True (merge missed executions into one)
       - max_instances=1 (no concurrent runs)
@@ -95,7 +105,9 @@ def create_scheduler(settings: AppSettings, engine: Engine) -> BlockingScheduler
 
     Args:
         settings: Application configuration.
-        engine: SQLAlchemy engine for the content database (not the job store).
+        engine: SQLAlchemy engine for the content database. Used only to
+                validate the setup at creation time; the scheduled job
+                creates its own engine.
 
     Returns:
         A configured BlockingScheduler (not yet started).
@@ -135,7 +147,7 @@ def create_scheduler(settings: AppSettings, engine: Engine) -> BlockingScheduler
         coalesce=True,
         max_instances=1,
         misfire_grace_time=settings.schedule.misfire_grace_time,
-        args=[settings, engine],
+        args=[settings],
     )
 
     return scheduler
