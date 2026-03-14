@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Pipeline Foundation
 **Goal**: The system can discover, download, and track YouTube videos unattended
 **Depends on**: Nothing (first phase)
-**Requirements**: ACQ-01, ACQ-02, ACQ-03, AUTO-01, AUTO-02, AUTO-03
+**Requirements**: ACQ-01, ACQ-02, ACQ-03, ACQ-04, AUTO-01, AUTO-02, AUTO-03
 **Success Criteria** (what must be TRUE):
   1. Operator edits a YAML config file with a channel list and credentials; the system reads it on startup without code changes
   2. The system polls configured YouTube channels on a schedule and downloads new videos (with metadata and thumbnails) without manual invocation

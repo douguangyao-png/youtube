@@ -12,6 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ACQ-01**: 通过 YouTube RSS 监控指定频道的新视频和 Shorts
 - [ ] **ACQ-02**: 通过 yt-dlp 下载 YouTube 视频（含元数据：标题、描述、缩略图）
 - [ ] **ACQ-03**: 支持配置要监控的频道列表（YAML/TOML 配置文件）
+- [ ] **ACQ-04**: 按视频时长过滤，只下载配置阈值以内的视频（默认 ≤ 3 分钟）
 
 ### Processing (内容处理)
 
@@ -44,7 +45,8 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ### Content Sources
 
-- **ACQ-04**: X (Twitter) 内容获取（推文、图片、短视频）
+- **ACQ-05**: X (Twitter) 内容获取（推文、图片、短视频）
+- **PROC-08**: AI 智能剪辑 — 长视频自动提取重点/结论片段，压缩为短视频
 
 ### Automation Enhancement
 
@@ -79,6 +81,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ACQ-01 | Phase 1 | Pending |
 | ACQ-02 | Phase 1 | Pending |
 | ACQ-03 | Phase 1 | Pending |
+| ACQ-04 | Phase 1 | Pending |
 | PROC-01 | Phase 2 | Pending |
 | PROC-02 | Phase 2 | Pending |
 | PROC-03 | Phase 2 | Pending |
@@ -93,8 +96,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTO-04 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements: 15 total
-- Mapped to phases: 15
+- v1 requirements: 16 total
+- Mapped to phases: 16
 - Unmapped: 0 ✓
 
 ---
