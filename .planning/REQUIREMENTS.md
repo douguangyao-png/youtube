@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Content Acquisition (内容获取)
 
-- [ ] **ACQ-01**: 通过 YouTube RSS 监控指定频道的新视频和 Shorts
-- [ ] **ACQ-02**: 通过 yt-dlp 下载 YouTube 视频（含元数据：标题、描述、缩略图）
+- [x] **ACQ-01**: 通过 YouTube RSS 监控指定频道的新视频和 Shorts
+- [x] **ACQ-02**: 通过 yt-dlp 下载 YouTube 视频（含元数据：标题、描述、缩略图）
 - [x] **ACQ-03**: 支持配置要监控的频道列表（YAML/TOML 配置文件）
-- [ ] **ACQ-04**: 按视频时长过滤，只下载配置阈值以内的视频（默认 ≤ 3 分钟）
+- [x] **ACQ-04**: 按视频时长过滤，只下载配置阈值以内的视频（默认 ≤ 3 分钟）
 
 ### Processing (内容处理)
 
@@ -78,10 +78,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ACQ-01 | Phase 1 | Pending |
-| ACQ-02 | Phase 1 | Pending |
+| ACQ-01 | Phase 1 | Complete |
+| ACQ-02 | Phase 1 | Complete |
 | ACQ-03 | Phase 1 | Complete |
-| ACQ-04 | Phase 1 | Pending |
+| ACQ-04 | Phase 1 | Complete |
 | PROC-01 | Phase 2 | Pending |
 | PROC-02 | Phase 2 | Pending |
 | PROC-03 | Phase 2 | Pending |

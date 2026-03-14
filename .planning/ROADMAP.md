@@ -28,11 +28,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A video already downloaded is not downloaded again across restarts (deduplication is persistent)
   4. After a crash or restart, the system resumes from the last known job state rather than restarting from scratch
   5. A SQLite database contains a content row per discovered video with a clear status (DISCOVERED, DOWNLOADED, FAILED, etc.)
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
-- [ ] 01-01-PLAN.md -- Project scaffolding, config system, and SQLModel state machine
-- [ ] 01-02-PLAN.md -- YouTube RSS feed poller and yt-dlp downloader with duration filtering
+- [x] 01-01-PLAN.md -- Project scaffolding, config system, and SQLModel state machine
+- [x] 01-02-PLAN.md -- YouTube RSS feed poller and yt-dlp downloader with duration filtering
 - [ ] 01-03-PLAN.md -- APScheduler wiring, crash recovery, and application entry point
 
 ### Phase 2: Content Processing
@@ -66,6 +66,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Pipeline Foundation | 1/3 | In Progress|  |
+| 1. Pipeline Foundation | 2/3 | In Progress|  |
 | 2. Content Processing | 0/TBD | Not started | - |
 | 3. Publishing & Automation | 0/TBD | Not started | - |
