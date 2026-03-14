@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **ACQ-01**: 通过 YouTube RSS 监控指定频道的新视频和 Shorts
 - [ ] **ACQ-02**: 通过 yt-dlp 下载 YouTube 视频（含元数据：标题、描述、缩略图）
-- [ ] **ACQ-03**: 支持配置要监控的频道列表（YAML/TOML 配置文件）
+- [x] **ACQ-03**: 支持配置要监控的频道列表（YAML/TOML 配置文件）
 - [ ] **ACQ-04**: 按视频时长过滤，只下载配置阈值以内的视频（默认 ≤ 3 分钟）
 
 ### Processing (内容处理)
@@ -31,8 +31,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Automation (自动化)
 
 - [ ] **AUTO-01**: APScheduler 定时轮询 YouTube 频道更新
-- [ ] **AUTO-02**: SQLite 去重，防止重复处理和发布
-- [ ] **AUTO-03**: 任务状态机（DISCOVERED→DOWNLOADED→PROCESSED→TRANSLATED→PUBLISHED/FAILED），崩溃后可恢复
+- [x] **AUTO-02**: SQLite 去重，防止重复处理和发布
+- [x] **AUTO-03**: 任务状态机（DISCOVERED→DOWNLOADED→PROCESSED→TRANSLATED→PUBLISHED/FAILED），崩溃后可恢复
 - [ ] **AUTO-04**: 发布间隔控制，每个平台可配置最小间隔时间，避免触发反垃圾机制
 
 ## v2 Requirements
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | ACQ-01 | Phase 1 | Pending |
 | ACQ-02 | Phase 1 | Pending |
-| ACQ-03 | Phase 1 | Pending |
+| ACQ-03 | Phase 1 | Complete |
 | ACQ-04 | Phase 1 | Pending |
 | PROC-01 | Phase 2 | Pending |
 | PROC-02 | Phase 2 | Pending |
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PUB-02 | Phase 3 | Pending |
 | PUB-03 | Phase 3 | Pending |
 | AUTO-01 | Phase 1 | Pending |
-| AUTO-02 | Phase 1 | Pending |
-| AUTO-03 | Phase 1 | Pending |
+| AUTO-02 | Phase 1 | Complete |
+| AUTO-03 | Phase 1 | Complete |
 | AUTO-04 | Phase 3 | Pending |
 
 **Coverage:**
