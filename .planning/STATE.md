@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 1 of 3 (Pipeline Foundation)
-Plan: 2 of 3 in current phase
+Plan: 3 of 3 in current phase
 Status: In progress
-Last activity: 2026-03-14 — Completed 01-02: RSS feed poller, yt-dlp downloader, acquisition pipeline
+Last activity: 2026-03-14 — Completed 01-03: APScheduler pipeline wiring, entry point, crash recovery
 
-Progress: [██░░░░░░░░] 22%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 5 min
-- Total execution time: 9 min
+- Total execution time: 15 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-pipeline-foundation | 2 | 9 min | 4.5 min |
+| 01-pipeline-foundation | 3 | 15 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 5 min
+- Last 5 plans: 4 min, 5 min, 6 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -52,6 +52,9 @@ Recent decisions affecting current work:
 - 01-02: cookiesfrombrowser must be tuple (browser, None, None, None) not string -- yt-dlp internal requirement
 - 01-02: Unknown/zero duration passes through filter -- don't block videos with unavailable duration data
 - 01-02: Metadata failure transitions to FAILED (not skip) -- operator visibility into broken videos
+- 01-03: Scheduled job receives only picklable AppSettings -- Engine is not serializable for APScheduler persistent job store
+- 01-03: coalesce/max_instances passed explicitly to add_job (not just job_defaults) -- defaults only applied after scheduler.start()
+- 01-03: Separate _jobs.db SQLite file for APScheduler job store to avoid lock contention with content database
 
 ### Pending Todos
 
@@ -66,5 +69,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 01-02-PLAN.md — RSS feed poller, yt-dlp downloader, acquisition pipeline
+Stopped at: Completed 01-03-PLAN.md — APScheduler pipeline wiring, entry point, crash recovery
 Resume file: None

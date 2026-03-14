@@ -30,7 +30,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Automation (自动化)
 
-- [ ] **AUTO-01**: APScheduler 定时轮询 YouTube 频道更新
+- [x] **AUTO-01**: APScheduler 定时轮询 YouTube 频道更新
 - [x] **AUTO-02**: SQLite 去重，防止重复处理和发布
 - [x] **AUTO-03**: 任务状态机（DISCOVERED→DOWNLOADED→PROCESSED→TRANSLATED→PUBLISHED/FAILED），崩溃后可恢复
 - [ ] **AUTO-04**: 发布间隔控制，每个平台可配置最小间隔时间，避免触发反垃圾机制
@@ -90,7 +90,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PUB-01 | Phase 3 | Pending |
 | PUB-02 | Phase 3 | Pending |
 | PUB-03 | Phase 3 | Pending |
-| AUTO-01 | Phase 1 | Pending |
+| AUTO-01 | Phase 1 | Complete |
 | AUTO-02 | Phase 1 | Complete |
 | AUTO-03 | Phase 1 | Complete |
 | AUTO-04 | Phase 3 | Pending |

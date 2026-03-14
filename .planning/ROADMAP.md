@@ -12,7 +12,7 @@ CrossPost is built as a staged pipeline: foundation first (state machine, config
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Pipeline Foundation** - State machine, config, scheduling, and YouTube acquisition
+- [x] **Phase 1: Pipeline Foundation** - State machine, config, scheduling, and YouTube acquisition
 - [ ] **Phase 2: Content Processing** - Transcoding, ASR, subtitle burn-in, and translation
 - [ ] **Phase 3: Publishing & Automation** - All platform publishers, anti-detection, and automation hardening
 
@@ -28,12 +28,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A video already downloaded is not downloaded again across restarts (deduplication is persistent)
   4. After a crash or restart, the system resumes from the last known job state rather than restarting from scratch
   5. A SQLite database contains a content row per discovered video with a clear status (DISCOVERED, DOWNLOADED, FAILED, etc.)
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans executed
 
 Plans:
 - [x] 01-01-PLAN.md -- Project scaffolding, config system, and SQLModel state machine
 - [x] 01-02-PLAN.md -- YouTube RSS feed poller and yt-dlp downloader with duration filtering
-- [ ] 01-03-PLAN.md -- APScheduler wiring, crash recovery, and application entry point
+- [x] 01-03-PLAN.md -- APScheduler wiring, crash recovery, and application entry point
 
 ### Phase 2: Content Processing
 **Goal**: Downloaded videos are transcoded, transcribed, subtitled, and translated into Chinese assets ready for publishing
@@ -66,6 +66,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Pipeline Foundation | 2/3 | In Progress|  |
+| 1. Pipeline Foundation | 3/3 | Complete | 2026-03-14 |
 | 2. Content Processing | 0/TBD | Not started | - |
 | 3. Publishing & Automation | 0/TBD | Not started | - |
