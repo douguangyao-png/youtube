@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from crosspost.config import AppSettings, ChannelConfig, DownloadConfig, ScheduleConfig
+from crosspost.config import AppSettings, ChannelConfig, DownloadConfig, ProcessingConfig, ScheduleConfig
 
 
 class TestChannelConfig:
@@ -119,3 +119,37 @@ schedule:
 
         with pytest.raises((ValidationError, Exception)):
             AppSettings(_yaml_file=str(config_path))
+
+
+class TestProcessingConfig:
+    def test_processing_config_defaults(self):
+        """ProcessingConfig has correct default values."""
+        pc = ProcessingConfig()
+        assert pc.asr_model == "medium"
+        assert pc.output_dir == "./processed"
+
+    def test_processing_config_api_key_fields(self):
+        """ProcessingConfig exposes deepl_auth_key, anthropic_api_key, font_path."""
+        pc = ProcessingConfig()
+        assert pc.deepl_auth_key == ""
+        assert pc.anthropic_api_key == ""
+        assert pc.font_path == "src/crosspost/assets/fonts/NotoSansCJKsc-Bold.otf"
+
+    def test_processing_config_max_retries(self):
+        """ProcessingConfig has max_retries defaulting to 2."""
+        pc = ProcessingConfig()
+        assert pc.max_retries == 2
+
+    def test_processing_config_custom_values(self):
+        """ProcessingConfig accepts custom values."""
+        pc = ProcessingConfig(asr_model="large-v3", output_dir="/custom", max_retries=3)
+        assert pc.asr_model == "large-v3"
+        assert pc.output_dir == "/custom"
+        assert pc.max_retries == 3
+
+    def test_app_settings_includes_processing(self):
+        """AppSettings includes a processing field with ProcessingConfig."""
+        settings = AppSettings()
+        assert hasattr(settings, "processing")
+        assert isinstance(settings.processing, ProcessingConfig)
+        assert settings.processing.asr_model == "medium"

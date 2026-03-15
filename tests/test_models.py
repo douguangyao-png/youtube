@@ -170,3 +170,62 @@ class TestStateTransitions:
 
         assert content.status == ContentStatus.DOWNLOADED
         assert content.video_path == "/downloads/vid.mp4"
+
+
+class TestContentProcessingFields:
+    def test_processing_artifact_fields_default_to_none(self, session, sample_content_data):
+        """Processing artifact fields (srt_path, translated_srt_path, etc.) default to None."""
+        content = Content(**sample_content_data, status=ContentStatus.DISCOVERED)
+        session.add(content)
+        session.commit()
+        session.refresh(content)
+
+        assert content.srt_path is None
+        assert content.translated_srt_path is None
+        assert content.ass_path is None
+        assert content.processed_video_path is None
+
+    def test_processing_timestamp_fields_default_to_none(self, session, sample_content_data):
+        """Processing timestamps (processed_at, translated_at) default to None."""
+        content = Content(**sample_content_data, status=ContentStatus.DISCOVERED)
+        session.add(content)
+        session.commit()
+        session.refresh(content)
+
+        assert content.processed_at is None
+        assert content.translated_at is None
+
+    def test_platform_metadata_field_default_to_none(self, session, sample_content_data):
+        """platform_metadata JSON field defaults to None."""
+        content = Content(**sample_content_data, status=ContentStatus.DISCOVERED)
+        session.add(content)
+        session.commit()
+        session.refresh(content)
+
+        assert content.platform_metadata is None
+
+    def test_processing_fields_round_trip(self, session, sample_content_data):
+        """Processing fields store and retrieve correctly from SQLite."""
+        now = datetime.now(timezone.utc)
+        content = Content(
+            **sample_content_data,
+            status=ContentStatus.PROCESSED,
+            srt_path="/subs/video.srt",
+            translated_srt_path="/subs/video.zh.srt",
+            ass_path="/subs/video.ass",
+            processed_video_path="/processed/video.mp4",
+            processed_at=now,
+            translated_at=now,
+            platform_metadata='{"bilibili": {"title": "translated"}}',
+        )
+        session.add(content)
+        session.commit()
+        session.refresh(content)
+
+        assert content.srt_path == "/subs/video.srt"
+        assert content.translated_srt_path == "/subs/video.zh.srt"
+        assert content.ass_path == "/subs/video.ass"
+        assert content.processed_video_path == "/processed/video.mp4"
+        assert content.processed_at is not None
+        assert content.translated_at is not None
+        assert "bilibili" in content.platform_metadata
