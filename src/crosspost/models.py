@@ -56,6 +56,23 @@ class Content(SQLModel, table=True):
     thumbnail_path: Optional[str] = Field(default=None, description="Local path to downloaded thumbnail")
     metadata_path: Optional[str] = Field(default=None, description="Local path to metadata JSON file")
 
+    # Processing artifact paths
+    srt_path: Optional[str] = Field(default=None, description="Path to English SRT file")
+    translated_srt_path: Optional[str] = Field(default=None, description="Path to Chinese translated SRT")
+    ass_path: Optional[str] = Field(default=None, description="Path to bilingual ASS subtitle file")
+    processed_video_path: Optional[str] = Field(
+        default=None, description="Path to final processed video with burned subtitles"
+    )
+
+    # Processing timestamps
+    processed_at: Optional[datetime] = Field(default=None, description="When processing completed")
+    translated_at: Optional[datetime] = Field(default=None, description="When metadata translation completed")
+
+    # Platform metadata
+    platform_metadata: Optional[str] = Field(
+        default=None, description="JSON string of per-platform translated titles/descriptions"
+    )
+
     # Lifecycle timestamps
     discovered_at: datetime = Field(
         default_factory=datetime.utcnow,

@@ -15,6 +15,17 @@ class ChannelConfig(BaseModel):
     max_duration: int | None = None  # None means "use global default"
 
 
+class ProcessingConfig(BaseModel):
+    """Processing pipeline settings for transcription, translation, and subtitle burn-in."""
+
+    asr_model: str = "medium"
+    output_dir: str = "./processed"
+    font_path: str = "src/crosspost/assets/fonts/NotoSansCJKsc-Bold.otf"
+    deepl_auth_key: str = ""
+    anthropic_api_key: str = ""
+    max_retries: int = 2
+
+
 class DownloadConfig(BaseModel):
     """Download settings for yt-dlp."""
 
@@ -66,6 +77,7 @@ class AppSettings(BaseSettings):
 
     channels: list[ChannelConfig] = []
     download: DownloadConfig = Field(default_factory=DownloadConfig)
+    processing: ProcessingConfig = Field(default_factory=ProcessingConfig)
     schedule: ScheduleConfig = Field(default_factory=ScheduleConfig)
     database_url: str = "sqlite:///crosspost.db"
     log_level: str = "INFO"
