@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md — Translator module (DeepL batch + Claude Haiku metadata)
-last_updated: "2026-03-15T12:45:50.023Z"
+stopped_at: Completed 02-04-PLAN.md — Subtitler module (bilingual ASS + FFmpeg burn-in)
+last_updated: "2026-03-15T12:50:05.468Z"
 last_activity: "2026-03-15 — Completed 02-03: Translator module (DeepL + Claude Haiku)"
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
-  percent: 75
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 2 of 3 (Content Processing)
-Plan: 3 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: In progress
-Last activity: 2026-03-15 — Completed 02-03: Translator module (DeepL + Claude Haiku)
+Last activity: 2026-03-15 — Completed 02-04: Subtitler module (bilingual ASS + FFmpeg burn-in)
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [████████░░] 75%
 *Updated after each plan completion*
 | Phase 02 P02 | 3 min | 2 tasks | 4 files |
 | Phase 02 P03 | 3 | 2 tasks | 2 files |
+| Phase 02 P04 | 2 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Empty whisper segments returns empty string (music video) not error
 - [Phase 02]: Batch all subtitle texts in single DeepL API call (not per-line) for efficiency
 - [Phase 02]: OpenCC t2s applied unconditionally on DeepL output (Traditional to Simplified Chinese)
+- [Phase 02]: backcolor alpha=102 for 60% opacity (pysubs2 inverted: 0=opaque, 255=transparent)
+- [Phase 02]: Chinese marginv = base + en_fontsize + 6 to stack above English line
+- [Phase 02]: subtitles filter (not ass filter) for FFmpeg burn-in — broader format compatibility
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T12:45:50.017Z
-Stopped at: Completed 02-03-PLAN.md — Translator module (DeepL batch + Claude Haiku metadata)
+Last session: 2026-03-15T12:50:05.447Z
+Stopped at: Completed 02-04-PLAN.md — Subtitler module (bilingual ASS + FFmpeg burn-in)
 Resume file: None
