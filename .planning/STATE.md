@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-03-PLAN.md — APScheduler pipeline wiring, entry point, crash recovery
-last_updated: "2026-03-14T16:45:10.450Z"
-last_activity: "2026-03-14 — Completed 01-03: APScheduler pipeline wiring, entry point, crash recovery"
+stopped_at: Completed 02-01-PLAN.md — ProcessingConfig, Content model extensions, Phase 2 dependencies
+last_updated: "2026-03-15T12:39:45.653Z"
+last_activity: "2026-03-15 — Completed 02-01: ProcessingConfig, Content model extensions, Phase 2 dependencies"
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 33
+  total_plans: 8
+  completed_plans: 4
+  percent: 50
 ---
 
 # Project State
@@ -21,32 +21,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** 自动化完成从海外内容抓取到国内平台发布的全流程，包括下载、转码、翻译、适配和发布，无需人工干预。
-**Current focus:** Phase 1 — Pipeline Foundation
+**Current focus:** Phase 2 — Content Processing
 
 ## Current Position
 
-Phase: 1 of 3 (Pipeline Foundation)
-Plan: 3 of 3 in current phase
+Phase: 2 of 3 (Content Processing)
+Plan: 1 of 5 in current phase
 Status: In progress
-Last activity: 2026-03-14 — Completed 01-03: APScheduler pipeline wiring, entry point, crash recovery
+Last activity: 2026-03-15 — Completed 02-01: ProcessingConfig, Content model extensions, Phase 2 dependencies
 
-Progress: [███░░░░░░░] 33%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 5 min
-- Total execution time: 15 min
+- Total plans completed: 4
+- Average duration: 4 min
+- Total execution time: 17 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-pipeline-foundation | 3 | 15 min | 5 min |
+| 02-content-processing | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 5 min, 6 min
+- Last 5 plans: 4 min, 5 min, 6 min, 2 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -71,6 +72,8 @@ Recent decisions affecting current work:
 - 01-03: Scheduled job receives only picklable AppSettings -- Engine is not serializable for APScheduler persistent job store
 - 01-03: coalesce/max_instances passed explicitly to add_job (not just job_defaults) -- defaults only applied after scheduler.start()
 - 01-03: Separate _jobs.db SQLite file for APScheduler job store to avoid lock contention with content database
+- 02-01: ProcessingConfig uses empty string defaults for API keys (runtime validation deferred to usage)
+- 02-01: platform_metadata stored as JSON string (not structured model) for flexibility across platforms
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-14
-Stopped at: Completed 01-03-PLAN.md — APScheduler pipeline wiring, entry point, crash recovery
+Last session: 2026-03-15
+Stopped at: Completed 02-01-PLAN.md — ProcessingConfig, Content model extensions, Phase 2 dependencies
 Resume file: None

@@ -16,11 +16,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Processing (内容处理)
 
-- [ ] **PROC-01**: 使用 faster-whisper 本地 ASR 提取英文字幕（SRT 格式）
-- [ ] **PROC-02**: 英文字幕翻译成中文（保留时间轴，句子级翻译）
-- [ ] **PROC-03**: 中文字幕烧录到视频中（支持 CJK 字体，适配竖屏/横屏）
-- [ ] **PROC-04**: 标题和描述用 LLM 翻译成自然中文（按平台风格适配）
-- [ ] **PROC-05**: 按各平台规格转码视频（H.264 MP4，分辨率/比例/码率适配）
+- [x] **PROC-01**: 使用 faster-whisper 本地 ASR 提取英文字幕（SRT 格式）
+- [x] **PROC-02**: 英文字幕翻译成中文（保留时间轴，句子级翻译）
+- [x] **PROC-03**: 中文字幕烧录到视频中（支持 CJK 字体，适配竖屏/横屏）
+- [x] **PROC-04**: 标题和描述用 LLM 翻译成自然中文（按平台风格适配）
+- [x] **PROC-05**: 按各平台规格转码视频（H.264 MP4，分辨率/比例/码率适配）
 
 ### Publishing (发布)
 
@@ -82,11 +82,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ACQ-02 | Phase 1 | Complete |
 | ACQ-03 | Phase 1 | Complete |
 | ACQ-04 | Phase 1 | Complete |
-| PROC-01 | Phase 2 | Pending |
-| PROC-02 | Phase 2 | Pending |
-| PROC-03 | Phase 2 | Pending |
-| PROC-04 | Phase 2 | Pending |
-| PROC-05 | Phase 2 | Pending |
+| PROC-01 | Phase 2 | Complete |
+| PROC-02 | Phase 2 | Complete |
+| PROC-03 | Phase 2 | Complete |
+| PROC-04 | Phase 2 | Complete |
+| PROC-05 | Phase 2 | Complete |
 | PUB-01 | Phase 3 | Pending |
 | PUB-02 | Phase 3 | Pending |
 | PUB-03 | Phase 3 | Pending |
