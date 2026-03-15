@@ -12,6 +12,7 @@ from crosspost.database import get_engine
 from crosspost.downloader import process_discovered_videos
 from crosspost.feeds import discover_new_videos
 from crosspost.models import Content, ContentStatus
+from crosspost.processor import process_downloaded_videos as process_videos
 
 
 def recover_incomplete_downloads(engine: Engine) -> int:
@@ -42,6 +43,7 @@ def recover_incomplete_downloads(engine: Engine) -> int:
 
     count = len(downloading)
     logger.info("Crash recovery: reset {} DOWNLOADING row(s) to DISCOVERED", count)
+    logger.info("Processing recovery: idempotent steps will resume from last checkpoint")
     return count
 
 
@@ -73,11 +75,15 @@ def poll_and_download_job(settings: AppSettings) -> None:
 
         downloaded = process_discovered_videos(engine, settings)
 
+        # Process downloaded videos (transcode, ASR, translate, burn subtitles)
+        processed = process_videos(engine, settings)
+
         logger.info(
-            "Poll complete: {} channel(s) polled, {} new video(s) discovered, {} downloaded",
+            "Poll complete: {} channel(s) polled, {} new video(s) discovered, {} downloaded, {} processed",
             len(settings.channels),
             total_discovered,
             downloaded,
+            processed,
         )
     except Exception as exc:
         logger.error("poll_and_download_job raised an unexpected error: {}", exc)

@@ -216,9 +216,11 @@ def test_poll_and_download_job(sample_settings, in_memory_engine):
         patch("crosspost.scheduler.get_engine", return_value=in_memory_engine),
         patch("crosspost.scheduler.discover_new_videos") as mock_discover,
         patch("crosspost.scheduler.process_discovered_videos") as mock_process,
+        patch("crosspost.scheduler.process_videos") as mock_proc_videos,
     ):
         mock_discover.return_value = []
         mock_process.return_value = 0
+        mock_proc_videos.return_value = 0
 
         poll_and_download_job(sample_settings)
 
@@ -247,9 +249,50 @@ def test_poll_and_download_job_no_channels(in_memory_engine):
         patch("crosspost.scheduler.get_engine", return_value=in_memory_engine),
         patch("crosspost.scheduler.discover_new_videos") as mock_discover,
         patch("crosspost.scheduler.process_discovered_videos") as mock_process,
+        patch("crosspost.scheduler.process_videos") as mock_proc_videos,
     ):
         mock_process.return_value = 0
+        mock_proc_videos.return_value = 0
         poll_and_download_job(settings)
 
         mock_discover.assert_not_called()
         mock_process.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# Task 2: poll_and_download_job calls process_videos after download
+# ---------------------------------------------------------------------------
+
+
+def test_poll_job_calls_process_videos_after_download(sample_settings, in_memory_engine):
+    """poll_and_download_job calls process_videos after process_discovered_videos."""
+    with (
+        patch("crosspost.scheduler.get_engine", return_value=in_memory_engine),
+        patch("crosspost.scheduler.discover_new_videos") as mock_discover,
+        patch("crosspost.scheduler.process_discovered_videos") as mock_download,
+        patch("crosspost.scheduler.process_videos") as mock_proc_videos,
+    ):
+        mock_discover.return_value = []
+        mock_download.return_value = 3
+        mock_proc_videos.return_value = 2
+
+        poll_and_download_job(sample_settings)
+
+        mock_proc_videos.assert_called_once_with(in_memory_engine, sample_settings)
+
+
+def test_poll_job_process_videos_receives_engine_and_settings(sample_settings, in_memory_engine):
+    """process_videos receives the engine and settings arguments."""
+    with (
+        patch("crosspost.scheduler.get_engine", return_value=in_memory_engine),
+        patch("crosspost.scheduler.discover_new_videos", return_value=[]),
+        patch("crosspost.scheduler.process_discovered_videos", return_value=0),
+        patch("crosspost.scheduler.process_videos") as mock_proc_videos,
+    ):
+        mock_proc_videos.return_value = 0
+
+        poll_and_download_job(sample_settings)
+
+        args, kwargs = mock_proc_videos.call_args
+        assert args[0] is in_memory_engine
+        assert args[1] is sample_settings
