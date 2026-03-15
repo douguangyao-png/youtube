@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md — Transcoder and Transcriber modules
-last_updated: "2026-03-15T12:45:26.116Z"
-last_activity: "2026-03-15 — Completed 02-02: Transcoder and Transcriber modules"
+stopped_at: Completed 02-03-PLAN.md — Translator module (DeepL batch + Claude Haiku metadata)
+last_updated: "2026-03-15T12:45:50.023Z"
+last_activity: "2026-03-15 — Completed 02-03: Translator module (DeepL + Claude Haiku)"
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 8
   completed_plans: 6
-  percent: 63
+  percent: 75
 ---
 
 # Project State
@@ -80,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 02]: Scale filter scale=-2:min(1080,ih) prevents upscaling below-1080p
 - [Phase 02]: WhisperModel cpu/int8, no retry decorator — retry at orchestrator level
 - [Phase 02]: Empty whisper segments returns empty string (music video) not error
+- [Phase 02]: Batch all subtitle texts in single DeepL API call (not per-line) for efficiency
+- [Phase 02]: OpenCC t2s applied unconditionally on DeepL output (Traditional to Simplified Chinese)
 
 ### Pending Todos
 
@@ -93,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T12:45:26.110Z
-Stopped at: Completed 02-02-PLAN.md — Transcoder and Transcriber modules
+Last session: 2026-03-15T12:45:50.017Z
+Stopped at: Completed 02-03-PLAN.md — Translator module (DeepL batch + Claude Haiku metadata)
 Resume file: None
