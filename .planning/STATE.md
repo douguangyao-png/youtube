@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-04-PLAN.md — Subtitler module (bilingual ASS + FFmpeg burn-in)
-last_updated: "2026-03-15T12:50:05.468Z"
-last_activity: "2026-03-15 — Completed 02-03: Translator module (DeepL + Claude Haiku)"
+stopped_at: Completed 02-05-PLAN.md -- Processing pipeline orchestrator
+last_updated: "2026-03-15T12:58:21.459Z"
+last_activity: "2026-03-15 — Completed 02-04: Subtitler module (bilingual ASS + FFmpeg burn-in)"
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
   percent: 88
 ---
 
@@ -54,6 +54,7 @@ Progress: [█████████░] 88%
 | Phase 02 P02 | 3 min | 2 tasks | 4 files |
 | Phase 02 P03 | 3 | 2 tasks | 2 files |
 | Phase 02 P04 | 2 min | 2 tasks | 3 files |
+| Phase 02 P05 | 5 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,8 @@ Recent decisions affecting current work:
 - [Phase 02]: backcolor alpha=102 for 60% opacity (pysubs2 inverted: 0=opaque, 255=transparent)
 - [Phase 02]: Chinese marginv = base + en_fontsize + 6 to stack above English line
 - [Phase 02]: subtitles filter (not ass filter) for FFmpeg burn-in — broader format compatibility
+- [Phase 02]: Retry wrapping per-phase with tenacity for cleaner error boundaries
+- [Phase 02]: Music video detection via empty srt_path string (consistent with transcriber return)
 
 ### Pending Todos
 
@@ -99,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T12:50:05.447Z
-Stopped at: Completed 02-04-PLAN.md — Subtitler module (bilingual ASS + FFmpeg burn-in)
+Last session: 2026-03-15T12:58:21.453Z
+Stopped at: Completed 02-05-PLAN.md -- Processing pipeline orchestrator
 Resume file: None
