@@ -45,7 +45,7 @@ Plans:
   3. The SRT file is translated to Chinese (sentence-level, timing preserved) and burned into the video with a legible CJK font
   4. The video title and description are translated into natural Chinese text appropriate to the target platform's style
   5. All processed artifacts (video file, SRT, translated metadata) are written to the job state before the job advances — a crash during processing does not re-trigger expensive ASR or translation calls
-**Plans:** 1/5 plans executed
+**Plans:** 3/5 plans executed
 
 Plans:
 - [ ] 02-01-PLAN.md -- Config extension and Phase 2 dependency install
@@ -74,5 +74,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Pipeline Foundation | 3/3 | Complete | 2026-03-14 |
-| 2. Content Processing | 1/5 | In Progress|  |
+| 2. Content Processing | 3/5 | In Progress|  |
 | 3. Publishing & Automation | 0/TBD | Not started | - |
