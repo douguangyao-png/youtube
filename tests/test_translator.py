@@ -207,3 +207,116 @@ class TestTranslateSrt:
             result = translate_srt(str(input_srt), str(output_srt), "fake-key")
 
         assert result == str(output_srt)
+
+
+# --- Metadata Translation Tests ---
+
+
+def _mock_anthropic_response(text: str) -> MagicMock:
+    """Create a mock Anthropic API response."""
+    mock_content = MagicMock()
+    mock_content.text = text
+    mock_response = MagicMock()
+    mock_response.content = [mock_content]
+    return mock_response
+
+
+class TestTranslateMetadata:
+    """Tests for translate_metadata function."""
+
+    def test_toutiao_uses_correct_system_prompt(self) -> None:
+        """translate_metadata calls Claude Haiku 4.5 with toutiao system prompt."""
+        with patch("anthropic.Anthropic") as mock_anthropic_cls:
+            mock_client = MagicMock()
+            mock_anthropic_cls.return_value = mock_client
+            mock_client.messages.create.return_value = _mock_anthropic_response("中文标题")
+
+            from crosspost.translator import translate_metadata
+
+            translate_metadata(
+                title="Test Video Title",
+                description="A description of the video",
+                platform="toutiao",
+                api_key="fake-key",
+            )
+
+        # Verify model used
+        calls = mock_client.messages.create.call_args_list
+        for call in calls:
+            assert call[1]["model"] == "claude-haiku-4-5"
+
+        # Verify toutiao system prompt contains news/information tone guidance
+        title_call = calls[0]
+        system_prompt = title_call[1]["system"]
+        assert "头条" in system_prompt or "toutiao" in system_prompt.lower() or "新闻" in system_prompt or "资讯" in system_prompt
+
+    def test_baijiahao_uses_correct_system_prompt(self) -> None:
+        """translate_metadata calls Claude Haiku 4.5 with baijiahao system prompt."""
+        with patch("anthropic.Anthropic") as mock_anthropic_cls:
+            mock_client = MagicMock()
+            mock_anthropic_cls.return_value = mock_client
+            mock_client.messages.create.return_value = _mock_anthropic_response("中文标题")
+
+            from crosspost.translator import translate_metadata
+
+            translate_metadata(
+                title="Test Video Title",
+                description="A description",
+                platform="baijiahao",
+                api_key="fake-key",
+            )
+
+        calls = mock_client.messages.create.call_args_list
+        title_call = calls[0]
+        system_prompt = title_call[1]["system"]
+        assert "百家号" in system_prompt or "baijiahao" in system_prompt.lower() or "SEO" in system_prompt
+
+    def test_returns_dict_with_title_and_description(self) -> None:
+        """translate_metadata returns dict with 'title' and 'description' keys."""
+        with patch("anthropic.Anthropic") as mock_anthropic_cls:
+            mock_client = MagicMock()
+            mock_anthropic_cls.return_value = mock_client
+            mock_client.messages.create.return_value = _mock_anthropic_response("翻译结果")
+
+            from crosspost.translator import translate_metadata
+
+            result = translate_metadata(
+                title="Test Title",
+                description="Test description",
+                platform="toutiao",
+                api_key="fake-key",
+            )
+
+        assert isinstance(result, dict)
+        assert "title" in result
+        assert "description" in result
+
+    def test_raises_keyerror_for_unknown_platform(self) -> None:
+        """translate_metadata raises KeyError for unknown platform."""
+        from crosspost.translator import translate_metadata
+
+        with pytest.raises(KeyError):
+            translate_metadata(
+                title="Test",
+                description="Test",
+                platform="xiaohongshu",
+                api_key="fake-key",
+            )
+
+    def test_platform_prompts_tone_guidance(self) -> None:
+        """System prompts contain correct tone guidance per platform."""
+        from crosspost.translator import PLATFORM_PROMPTS
+
+        # Toutiao: news/information tone
+        toutiao_prompt = PLATFORM_PROMPTS["toutiao"]
+        assert any(
+            keyword in toutiao_prompt
+            for keyword in ["新闻", "资讯", "news", "information", "头条"]
+        )
+
+        # Baijiahao: formal/SEO tone
+        baijiahao_prompt = PLATFORM_PROMPTS["baijiahao"]
+        assert any(
+            keyword in baijiahao_prompt
+            for keyword in ["SEO", "百家号", "formal", "正式", "搜索"]
+        )
