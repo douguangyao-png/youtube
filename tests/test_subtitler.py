@@ -3,7 +3,9 @@
 import pysubs2
 import pytest
 
-from crosspost.subtitler import build_bilingual_ass
+from unittest.mock import patch
+
+from crosspost.subtitler import build_bilingual_ass, burn_subtitles
 
 
 @pytest.fixture()
@@ -134,3 +136,46 @@ class TestBuildBilingualAss:
         """Returns empty string when both SRT paths are empty (music video)."""
         result = build_bilingual_ass("", "", str(tmp_path / "out.ass"), 1080, False)
         assert result == ""
+
+
+class TestBurnSubtitles:
+    """Tests for burn_subtitles function."""
+
+    @patch("crosspost.subtitler.subprocess.run")
+    def test_ffmpeg_subtitles_filter(self, mock_run):
+        """burn_subtitles builds FFmpeg command with subtitles filter and fontsdir."""
+        burn_subtitles("/tmp/video.mp4", "/tmp/subs.ass", "/tmp/out.mp4", "/fonts")
+        cmd = mock_run.call_args[0][0]
+        vf_idx = cmd.index("-vf")
+        vf_arg = cmd[vf_idx + 1]
+        assert "subtitles=/tmp/subs.ass" in vf_arg
+        assert "fontsdir=/fonts" in vf_arg
+
+    @patch("crosspost.subtitler.subprocess.run")
+    def test_video_codec_settings(self, mock_run):
+        """burn_subtitles uses -c:v libx264 -crf 20 -preset medium."""
+        burn_subtitles("/tmp/video.mp4", "/tmp/subs.ass", "/tmp/out.mp4", "/fonts")
+        cmd = mock_run.call_args[0][0]
+        assert cmd[cmd.index("-c:v") + 1] == "libx264"
+        assert cmd[cmd.index("-crf") + 1] == "20"
+        assert cmd[cmd.index("-preset") + 1] == "medium"
+
+    @patch("crosspost.subtitler.subprocess.run")
+    def test_audio_copy(self, mock_run):
+        """burn_subtitles uses -c:a copy (no audio re-encode)."""
+        burn_subtitles("/tmp/video.mp4", "/tmp/subs.ass", "/tmp/out.mp4", "/fonts")
+        cmd = mock_run.call_args[0][0]
+        assert cmd[cmd.index("-c:a") + 1] == "copy"
+
+    @patch("crosspost.subtitler.subprocess.run")
+    def test_timeout_900(self, mock_run):
+        """burn_subtitles sets timeout=900 on subprocess.run."""
+        burn_subtitles("/tmp/video.mp4", "/tmp/subs.ass", "/tmp/out.mp4", "/fonts")
+        kwargs = mock_run.call_args[1]
+        assert kwargs["timeout"] == 900
+
+    @patch("crosspost.subtitler.subprocess.run")
+    def test_returns_output_path(self, mock_run):
+        """burn_subtitles returns output_path on success."""
+        result = burn_subtitles("/tmp/video.mp4", "/tmp/subs.ass", "/tmp/out.mp4", "/fonts")
+        assert result == "/tmp/out.mp4"
