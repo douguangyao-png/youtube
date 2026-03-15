@@ -45,7 +45,14 @@ Plans:
   3. The SRT file is translated to Chinese (sentence-level, timing preserved) and burned into the video with a legible CJK font
   4. The video title and description are translated into natural Chinese text appropriate to the target platform's style
   5. All processed artifacts (video file, SRT, translated metadata) are written to the job state before the job advances — a crash during processing does not re-trigger expensive ASR or translation calls
-**Plans**: TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 02-01-PLAN.md -- Config extension and Phase 2 dependency install
+- [ ] 02-02-PLAN.md -- Transcoder (ffprobe + H.264 transcode) and transcriber (faster-whisper ASR to SRT)
+- [ ] 02-03-PLAN.md -- Translator (DeepL subtitle translation + Claude metadata translation)
+- [ ] 02-04-PLAN.md -- Subtitler (bilingual ASS generation + FFmpeg burn-in)
+- [ ] 02-05-PLAN.md -- Processor orchestrator wiring and scheduler integration
 
 ### Phase 3: Publishing & Automation
 **Goal**: Processed and translated videos are automatically published to all target platforms with anti-detection safeguards and rate controls
@@ -67,5 +74,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Pipeline Foundation | 3/3 | Complete | 2026-03-14 |
-| 2. Content Processing | 0/TBD | Not started | - |
+| 2. Content Processing | 0/5 | Not started | - |
 | 3. Publishing & Automation | 0/TBD | Not started | - |
