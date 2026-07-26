@@ -87,3 +87,39 @@ class Content(SQLModel, table=True):
     error_message: Optional[str] = Field(
         default=None, description="Error details from the most recent failure"
     )
+
+
+class PublishStatus(str, Enum):
+    """State values for per-platform publish attempts."""
+
+    PENDING = "PENDING"
+    PUBLISHING = "PUBLISHING"
+    PUBLISHED = "PUBLISHED"
+    FAILED = "FAILED"
+    SKIPPED = "SKIPPED"
+
+
+class PublishRecord(SQLModel, table=True):
+    """Tracks publishing state for one content item on one platform."""
+
+    __tablename__ = "publish_record"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    content_id: int = Field(foreign_key="content.id", index=True)
+    video_id: str = Field(index=True)
+    platform: str = Field(index=True)
+    status: PublishStatus = Field(
+        default=PublishStatus.PENDING,
+        sa_column=Column(
+            SAEnum(PublishStatus, values_callable=lambda x: [e.value for e in x]),
+            nullable=False,
+        ),
+    )
+    attempts: int = Field(default=0)
+    platform_post_id: Optional[str] = Field(default=None)
+    platform_url: Optional[str] = Field(default=None)
+    error_message: Optional[str] = Field(default=None)
+    next_attempt_at: Optional[datetime] = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    published_at: Optional[datetime] = Field(default=None)

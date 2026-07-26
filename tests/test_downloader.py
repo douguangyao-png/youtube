@@ -94,6 +94,25 @@ class TestGetVideoMetadata:
         assert isinstance(cookies_value, tuple), f"cookiesfrombrowser must be tuple, got {type(cookies_value)}"
         assert cookies_value[0] == "firefox"
 
+    def test_get_metadata_uses_cookie_file_when_configured(self, mocker):
+        """cookies_file is passed to yt-dlp instead of browser cookies."""
+        mock_ydl_class = mocker.patch("yt_dlp.YoutubeDL")
+        mock_ydl_instance = MagicMock()
+        mock_ydl_instance.__enter__ = MagicMock(return_value=mock_ydl_instance)
+        mock_ydl_instance.__exit__ = MagicMock(return_value=False)
+        mock_ydl_instance.extract_info.return_value = SAMPLE_METADATA
+        mock_ydl_class.return_value = mock_ydl_instance
+
+        get_video_metadata(
+            "https://www.youtube.com/watch?v=testvid001",
+            cookies_browser="firefox",
+            cookies_file="/tmp/youtube-cookies.txt",
+        )
+
+        opts = mock_ydl_class.call_args[0][0]
+        assert opts["cookiefile"] == "/tmp/youtube-cookies.txt"
+        assert "cookiesfrombrowser" not in opts
+
     def test_get_metadata_returns_none_on_error(self, mocker):
         """Returns None when yt-dlp raises an exception."""
         mock_ydl_instance = MagicMock()
@@ -194,6 +213,26 @@ class TestDownloadVideo:
         cookies_value = opts["cookiesfrombrowser"]
         assert isinstance(cookies_value, tuple)
         assert cookies_value[0] == "firefox"
+
+    def test_download_video_uses_cookie_file_when_configured(self, mocker, tmp_path):
+        """download_video also supports Netscape cookies.txt."""
+        mock_ydl_class = mocker.patch("yt_dlp.YoutubeDL")
+        mock_ydl_instance = MagicMock()
+        mock_ydl_instance.__enter__ = MagicMock(return_value=mock_ydl_instance)
+        mock_ydl_instance.__exit__ = MagicMock(return_value=False)
+        mock_ydl_instance.extract_info.return_value = SAMPLE_METADATA
+        mock_ydl_class.return_value = mock_ydl_instance
+
+        download_video(
+            "https://www.youtube.com/watch?v=testvid001",
+            str(tmp_path),
+            cookies_browser="firefox",
+            cookies_file="/tmp/youtube-cookies.txt",
+        )
+
+        opts = mock_ydl_class.call_args[0][0]
+        assert opts["cookiefile"] == "/tmp/youtube-cookies.txt"
+        assert "cookiesfrombrowser" not in opts
 
     def test_download_video_creates_output_dir(self, mocker, tmp_path):
         """download_video creates the output directory if it does not exist."""
@@ -344,6 +383,44 @@ class TestProcessDiscoveredVideos:
         with Session(engine) as session:
             content = session.exec(sqlselect(Content).where(Content.video_id == "durtest001")).one()
             assert content.duration == 95
+
+    def test_process_discovered_updates_metadata_fields(self, mocker, engine, settings):
+        """Manual submissions are enriched with metadata from yt-dlp."""
+        with Session(engine) as session:
+            content = Content(
+                video_id="manual001xY",
+                channel_id="manual",
+                title="Manual submission",
+                video_url="https://www.youtube.com/watch?v=manual001xY",
+                status=ContentStatus.DISCOVERED,
+            )
+            session.add(content)
+            session.commit()
+
+        meta = {
+            **SAMPLE_METADATA,
+            "id": "manual001xY",
+            "title": "Resolved Title",
+            "description": "Resolved description",
+            "duration": 88,
+            "thumbnail": "https://example.com/thumb.jpg",
+            "webpage_url": "https://www.youtube.com/watch?v=manual001xY",
+            "channel_id": "UCresolved",
+        }
+        mocker.patch("crosspost.downloader.get_video_metadata", return_value=meta)
+        mocker.patch(
+            "crosspost.downloader.download_video",
+            return_value={"id": "manual001xY", "requested_downloads": [{"filepath": "/tmp/manual001xY.mp4"}]},
+        )
+
+        process_discovered_videos(engine, settings)
+
+        with Session(engine) as session:
+            content = session.exec(sqlselect(Content).where(Content.video_id == "manual001xY")).one()
+            assert content.title == "Resolved Title"
+            assert content.description == "Resolved description"
+            assert content.thumbnail_url == "https://example.com/thumb.jpg"
+            assert content.channel_id == "UCresolved"
 
     def test_process_discovered_returns_count(self, mocker, engine, settings):
         """Returns the number of successfully downloaded videos."""

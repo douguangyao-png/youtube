@@ -13,7 +13,28 @@ from crosspost.config import AppSettings, ChannelConfig
 from crosspost.models import Content, ContentStatus
 
 
-def get_video_metadata(video_url: str, cookies_browser: str = "firefox") -> dict | None:
+LAST_METADATA_ERROR: str | None = None
+
+
+def _with_cookies(opts: dict, cookies_browser: str, cookies_file: str = "") -> dict:
+    """Return yt-dlp options with a cookies file or browser cookies."""
+    if cookies_file:
+        opts["cookiefile"] = cookies_file
+    elif cookies_browser and cookies_browser.lower() not in {"none", "false", "disabled", "off"}:
+        opts["cookiesfrombrowser"] = (cookies_browser, None, None, None)
+    return opts
+
+
+def _is_missing_browser_cookies_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    return "could not find" in message and "cookies database" in message
+
+
+def get_video_metadata(
+    video_url: str,
+    cookies_browser: str = "firefox",
+    cookies_file: str = "",
+) -> dict | None:
     """Extract video metadata without downloading.
 
     Args:
@@ -25,19 +46,34 @@ def get_video_metadata(video_url: str, cookies_browser: str = "firefox") -> dict
         Info dict from yt-dlp with duration, title, description, thumbnail, etc.
         Returns None on any error.
     """
-    opts = {
+    global LAST_METADATA_ERROR
+    LAST_METADATA_ERROR = None
+
+    opts = _with_cookies({
         "skip_download": True,
         "quiet": True,
         "no_warnings": True,
-        # CRITICAL: cookiesfrombrowser MUST be a tuple, not a string.
-        # Format: (browser, profile, keyring, container)
-        "cookiesfrombrowser": (cookies_browser, None, None, None),
-    }
+    }, cookies_browser, cookies_file)
     try:
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(video_url, download=False)
             return info
     except Exception as exc:
+        LAST_METADATA_ERROR = str(exc)
+        if _is_missing_browser_cookies_error(exc):
+            logger.warning("Browser cookies unavailable for {}; retrying without cookies", video_url)
+            try:
+                fallback_opts = {
+                    "skip_download": True,
+                    "quiet": True,
+                    "no_warnings": True,
+                }
+                with yt_dlp.YoutubeDL(fallback_opts) as ydl:
+                    return ydl.extract_info(video_url, download=False)
+            except Exception as fallback_exc:
+                LAST_METADATA_ERROR = str(fallback_exc)
+                logger.error("Failed to get metadata for {} without cookies: {}", video_url, fallback_exc)
+                return None
         logger.error("Failed to get metadata for {}: {}", video_url, exc)
         return None
 
@@ -67,6 +103,7 @@ def download_video(
     output_dir: str,
     cookies_browser: str = "firefox",
     format_str: str = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+    cookies_file: str = "",
 ) -> dict:
     """Download a video with thumbnail and info JSON using yt-dlp.
 
@@ -81,18 +118,32 @@ def download_video(
     """
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    opts = {
+    opts = _with_cookies({
         "format": format_str,
         "outtmpl": f"{output_dir}/%(id)s.%(ext)s",
         "writethumbnail": True,
         "writeinfojson": True,
-        "cookiesfrombrowser": (cookies_browser, None, None, None),
         "quiet": True,
         "no_warnings": True,
-    }
+    }, cookies_browser, cookies_file)
 
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        return ydl.extract_info(video_url, download=True)
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            return ydl.extract_info(video_url, download=True)
+    except Exception as exc:
+        if _is_missing_browser_cookies_error(exc):
+            logger.warning("Browser cookies unavailable for {}; downloading without cookies", video_url)
+            fallback_opts = {
+                "format": format_str,
+                "outtmpl": f"{output_dir}/%(id)s.%(ext)s",
+                "writethumbnail": True,
+                "writeinfojson": True,
+                "quiet": True,
+                "no_warnings": True,
+            }
+            with yt_dlp.YoutubeDL(fallback_opts) as ydl:
+                return ydl.extract_info(video_url, download=True)
+        raise
 
 
 def _get_channel_max_duration(settings: AppSettings, channel_id: str) -> int:
@@ -137,7 +188,11 @@ def process_discovered_videos(engine: Engine, settings: AppSettings) -> int:
 
         # Step 1: Fetch metadata
         logger.debug("Fetching metadata for video_id={}", content.video_id)
-        metadata = get_video_metadata(video_url, cookies_browser=settings.download.cookies_browser)
+        metadata = get_video_metadata(
+            video_url,
+            cookies_browser=settings.download.cookies_browser,
+            cookies_file=settings.download.cookies_file,
+        )
 
         if metadata is None:
             logger.error("Failed to get metadata for video_id={}, marking FAILED", content.video_id)
@@ -145,13 +200,19 @@ def process_discovered_videos(engine: Engine, settings: AppSettings) -> int:
                 item = session.get(Content, content.id)
                 if item:
                     item.status = ContentStatus.FAILED
-                    item.error_message = "Failed to retrieve video metadata"
+                    detail = LAST_METADATA_ERROR or "unknown error"
+                    item.error_message = f"Failed to retrieve video metadata: {detail}"
                     item.failed_at = datetime.utcnow()
                     session.commit()
             continue
 
         # Step 2: Update duration from metadata
         duration = metadata.get("duration", 0) or 0
+        title = metadata.get("title") or content.title
+        description = metadata.get("description") or content.description
+        thumbnail = metadata.get("thumbnail") or content.thumbnail_url
+        webpage_url = metadata.get("webpage_url") or video_url
+        channel_id = metadata.get("channel_id") or metadata.get("uploader_id") or content.channel_id
 
         # Step 3: Duration check
         max_duration = _get_channel_max_duration(settings, content.channel_id)
@@ -167,6 +228,11 @@ def process_discovered_videos(engine: Engine, settings: AppSettings) -> int:
                 item = session.get(Content, content.id)
                 if item:
                     item.duration = duration
+                    item.title = title
+                    item.description = description
+                    item.thumbnail_url = thumbnail
+                    item.video_url = webpage_url
+                    item.channel_id = channel_id
                     session.commit()
             continue
 
@@ -176,6 +242,11 @@ def process_discovered_videos(engine: Engine, settings: AppSettings) -> int:
             if item:
                 item.status = ContentStatus.DOWNLOADING
                 item.duration = duration
+                item.title = title
+                item.description = description
+                item.thumbnail_url = thumbnail
+                item.video_url = webpage_url
+                item.channel_id = channel_id
                 session.commit()
 
         # Step 5: Download
@@ -186,6 +257,7 @@ def process_discovered_videos(engine: Engine, settings: AppSettings) -> int:
                 settings.download.output_dir,
                 cookies_browser=settings.download.cookies_browser,
                 format_str=settings.download.format,
+                cookies_file=settings.download.cookies_file,
             )
 
             # Step 6: Transition to DOWNLOADED

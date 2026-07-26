@@ -33,6 +33,7 @@ class DownloadConfig(BaseModel):
     max_duration: int = 180  # seconds; videos longer than this are skipped
     format: str = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
     cookies_browser: str = "firefox"
+    cookies_file: str = ""
 
 
 class ScheduleConfig(BaseModel):
@@ -47,6 +48,52 @@ class ScheduleConfig(BaseModel):
         if v < 1:
             raise ValueError("poll_interval_minutes must be >= 1")
         return v
+
+
+class ApiPublisherConfig(BaseModel):
+    """Configuration for an HTTP API based publisher."""
+
+    endpoint: str = ""
+    token: str = ""
+    token_header: str = "Authorization"
+    token_prefix: str = "Bearer"
+    title_field: str = "title"
+    description_field: str = "description"
+    video_field: str = "video_path"
+    extra_payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class BrowserPublisherConfig(BaseModel):
+    """Configuration for a Playwright browser based publisher."""
+
+    login_url: str = ""
+    upload_url: str = ""
+    storage_state_path: str = ""
+    headless: bool = True
+    title_selector: str = ""
+    description_selector: str = ""
+    file_selector: str = "input[type=file]"
+    submit_selector: str = ""
+    success_selector: str = ""
+    wait_after_submit_seconds: int = 10
+
+
+class PublisherConfig(BaseModel):
+    """Per-platform publisher settings."""
+
+    enabled: bool = False
+    backend: str = "api"  # api, browser, dry_run
+    min_interval_minutes: int = Field(default=120, ge=0)
+    max_retries: int = Field(default=2, ge=1)
+    api: ApiPublisherConfig = Field(default_factory=ApiPublisherConfig)
+    browser: BrowserPublisherConfig = Field(default_factory=BrowserPublisherConfig)
+
+
+class PublishingConfig(BaseModel):
+    """Publishing stage configuration."""
+
+    enabled: bool = False
+    platforms: dict[str, PublisherConfig] = Field(default_factory=dict)
 
 
 class YamlFileSource(PydanticBaseSettingsSource):
@@ -78,6 +125,7 @@ class AppSettings(BaseSettings):
     channels: list[ChannelConfig] = []
     download: DownloadConfig = Field(default_factory=DownloadConfig)
     processing: ProcessingConfig = Field(default_factory=ProcessingConfig)
+    publishing: PublishingConfig = Field(default_factory=PublishingConfig)
     schedule: ScheduleConfig = Field(default_factory=ScheduleConfig)
     database_url: str = "sqlite:///crosspost.db"
     log_level: str = "INFO"

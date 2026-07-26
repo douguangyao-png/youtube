@@ -17,12 +17,60 @@ download:
   output_dir: "./downloads"    # Directory for downloaded files
   max_duration: 180            # Skip videos longer than this (seconds, default: 180 = 3 min)
   cookies_browser: "firefox"   # Browser to extract cookies from (for age-gated content)
+  cookies_file: ""             # Optional Netscape cookies.txt path; preferred on servers without browsers
   # format: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
 
 # --- Scheduling settings ---
 schedule:
   poll_interval_minutes: 30   # How often to check channels for new videos (min: 1)
   misfire_grace_time: 300     # How long to wait if a job fires late (seconds)
+
+# --- Publishing settings ---
+# Publishing is disabled by default. Enable dry_run first to verify queueing,
+# rate limits, metadata, and dashboard visibility without posting to platforms.
+publishing:
+  enabled: false
+  platforms:
+    toutiao:
+      enabled: false
+      backend: "api"                 # api | browser | dry_run
+      min_interval_minutes: 120
+      max_retries: 2
+      api:
+        endpoint: "https://example.com/toutiao/publish"
+        token: ""
+        token_header: "Authorization"
+        token_prefix: "Bearer"
+        title_field: "title"
+        description_field: "description"
+        video_field: "video_path"
+        extra_payload: {}
+    baijiahao:
+      enabled: false
+      backend: "api"
+      min_interval_minutes: 120
+      max_retries: 2
+      api:
+        endpoint: "https://example.com/baijiahao/publish"
+        token: ""
+        token_header: "Authorization"
+        token_prefix: "Bearer"
+    xiaohongshu:
+      enabled: false
+      backend: "browser"
+      min_interval_minutes: 180
+      max_retries: 2
+      browser:
+        login_url: "https://creator.xiaohongshu.com"
+        upload_url: "https://creator.xiaohongshu.com/publish/publish"
+        storage_state_path: "./sessions/xiaohongshu.json"
+        headless: true
+        file_selector: "input[type=file]"
+        title_selector: ""
+        description_selector: ""
+        submit_selector: ""
+        success_selector: ""
+        wait_after_submit_seconds: 10
 
 # --- Application settings ---
 database_url: "sqlite:///crosspost.db"   # SQLite database file path

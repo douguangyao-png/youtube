@@ -3,7 +3,15 @@
 import pytest
 from pydantic import ValidationError
 
-from crosspost.config import AppSettings, ChannelConfig, DownloadConfig, ProcessingConfig, ScheduleConfig
+from crosspost.config import (
+    AppSettings,
+    ChannelConfig,
+    DownloadConfig,
+    ProcessingConfig,
+    PublisherConfig,
+    PublishingConfig,
+    ScheduleConfig,
+)
 
 
 class TestChannelConfig:
@@ -153,3 +161,46 @@ class TestProcessingConfig:
         assert hasattr(settings, "processing")
         assert isinstance(settings.processing, ProcessingConfig)
         assert settings.processing.asr_model == "medium"
+
+
+class TestPublishingConfig:
+    def test_publishing_config_defaults_disabled(self):
+        """Publishing is disabled by default."""
+        cfg = PublishingConfig()
+        assert cfg.enabled is False
+        assert cfg.platforms == {}
+
+    def test_publisher_config_is_configurable(self):
+        """PublisherConfig exposes backend, retry, rate limit, and API settings."""
+        cfg = PublisherConfig(
+            enabled=True,
+            backend="dry_run",
+            min_interval_minutes=45,
+            max_retries=3,
+        )
+        assert cfg.enabled is True
+        assert cfg.backend == "dry_run"
+        assert cfg.min_interval_minutes == 45
+        assert cfg.max_retries == 3
+
+    def test_app_settings_loads_publishing_from_yaml(self, tmp_path):
+        """Publishing platforms can be defined in YAML."""
+        config_path = tmp_path / "publishing.yaml"
+        config_path.write_text(
+            """
+publishing:
+  enabled: true
+  platforms:
+    toutiao:
+      enabled: true
+      backend: dry_run
+      min_interval_minutes: 5
+"""
+        )
+
+        settings = AppSettings(_yaml_file=str(config_path))
+
+        assert settings.publishing.enabled is True
+        assert settings.publishing.platforms["toutiao"].enabled is True
+        assert settings.publishing.platforms["toutiao"].backend == "dry_run"
+        assert settings.publishing.platforms["toutiao"].min_interval_minutes == 5

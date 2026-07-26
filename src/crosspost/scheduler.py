@@ -13,6 +13,7 @@ from crosspost.downloader import process_discovered_videos
 from crosspost.feeds import discover_new_videos
 from crosspost.models import Content, ContentStatus
 from crosspost.processor import process_downloaded_videos as process_videos
+from crosspost.publisher import publish_translated_videos
 
 
 def recover_incomplete_downloads(engine: Engine) -> int:
@@ -78,12 +79,16 @@ def poll_and_download_job(settings: AppSettings) -> None:
         # Process downloaded videos (transcode, ASR, translate, burn subtitles)
         processed = process_videos(engine, settings)
 
+        # Publish translated videos to enabled platforms.
+        published = publish_translated_videos(engine, settings)
+
         logger.info(
-            "Poll complete: {} channel(s) polled, {} new video(s) discovered, {} downloaded, {} processed",
+            "Poll complete: {} channel(s) polled, {} new video(s) discovered, {} downloaded, {} processed, {} published",
             len(settings.channels),
             total_discovered,
             downloaded,
             processed,
+            published,
         )
     except Exception as exc:
         logger.error("poll_and_download_job raised an unexpected error: {}", exc)

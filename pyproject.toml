@@ -20,10 +20,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+browser = [
+    "playwright>=1.49.0",
+]
 dev = [
     "pytest>=8.0.0",
     "pytest-mock>=3.14.0",
 ]
+
+[project.scripts]
+crosspost-web = "crosspost.web:main"
 
 [build-system]
 requires = ["hatchling"]
